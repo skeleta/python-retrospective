@@ -1,4 +1,7 @@
 class Person:
+    MALE = 'M'
+    FEMALE = 'F'
+
     def __init__(self, name, birth_year,
                  gender, father=None, mother=None):
         self.name = name
@@ -25,10 +28,10 @@ class Person:
             return self.kids
 
     def get_sisters(self):
-        return self._get_siblings("F")
+        return self._get_siblings(self.FEMALE)
 
     def get_brothers(self):
-        return self._get_siblings("M")
+        return self._get_siblings(self.MALE)
 
     def is_direct_successor(self, other_person):
         return other_person in self.children()
