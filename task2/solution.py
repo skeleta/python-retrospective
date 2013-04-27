@@ -20,10 +20,7 @@ def iterate(func):
 
 
 def zip_with(func, *iterables):
-    zipped = zip(*iterables)
-    while True:
-            zip_it = next(zipped)
-            yield func(*zip_it)
+    return (func(*args) for args in zip(*iterables))
 
 
 def cache(func, cache_size):
