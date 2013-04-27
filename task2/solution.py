@@ -1,36 +1,41 @@
+from collections import OrderedDict
+
+
 def groupby(func, seq):
     storage = {}
-    z = map(func, seq)
-    for i in seq:
-        storage.setdefault(next(z), []).append(i)
+    key = map(func, seq)
+    for item in seq:
+        storage.setdefault(next(key), []).append(item)
     return storage
 
 
 def iterate(func):
-    def identity(p):
-        return p
+    identity = lambda arguments: arguments
 
-    def composition(f1, f2):
-        return (lambda x: f1(f2(x)))
+    def composition(first_function, second_function):
+        return (lambda arg: first_function(second_function(arg)))
     while True:
         yield identity
         identity = composition(func, identity)
 
 
 def zip_with(func, *iterables):
-    ziped = zip(*iterables)
+    zipped = zip(*iterables)
     while True:
-            zip_it = next(ziped)
+            zip_it = next(zipped)
             yield func(*zip_it)
 
 
 def cache(func, cache_size):
-    results = {}
+    cached_args = OrderedDict()
 
-    def func_cashed(x):
-        if not x in results:
-            results[x] = func(x)
-            if (len(results) > cache_size):
-                results.popitem()
-        return results[x]
+    if cache_size <= 0:
+        return func
+
+    def func_cashed(*args):
+        if args not in cached_args:
+            if (len(cached_args) >= cache_size):
+                cached_args .popitem(False)
+            cached_args[args] = func(*args)
+        return cached_args[args]
     return func_cashed
