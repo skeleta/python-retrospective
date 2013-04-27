@@ -9,6 +9,23 @@ class Person:
         self.father = father
         self.mother = mother
         Person.family.update({self: [father, mother, self.gender]})
+        self.kids = []
+
+        if self.father:
+            self.father.kids.append(self)
+
+        if self.mother:
+            self.mother.kids.append(self)
+
+    def children(self, gender=None):
+        if gender:
+            children = []
+            for person in self.kids:
+                if person.gender == gender:
+                    children.append(person)
+            return children
+        else:
+            return self.kids
 
     def get_sisters(self):
         sisters = []
@@ -41,19 +58,6 @@ class Person:
                             if key not in brothers:
                                 brothers.append(key)
         return brothers
-
-    def children(self, gender=None):
-        children = []
-        if gender is None:
-            for key, value in Person.family.items():
-                if self is value[0] or self is value[1]:
-                    children.append(key)
-        else:
-            for key, value in Person.family.items():
-                if self is value[0] or self is value[1]:
-                    if gender == value[2]:
-                        children.append(key)
-        return children
 
     def is_direct_successor(self, other):
         for key, value in Person.family.items():
