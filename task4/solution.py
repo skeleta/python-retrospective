@@ -1,18 +1,17 @@
 class TicTacToeBoard:
-    ALL_LINES = {"A1": (("A2", "A3"), ("B1", "C1"), ("B2", "C3")),
-                 "A2": (("A1", "A3"), ("B2", "C2")),
-                 "A3": (("A1", "A2"), ("B3", "C3"), ("B2", "C1")),
-                 "B1": (("B2", "B3"), ("A1", "C1")),
-                 "B2": (("B1", "B3"), ("A2", "C2"),
-                        ("A1", "C3"), ("A3", "C1")),
-                 "B3": (("B1", "B2"), ("A3", "C3")),
-                 "C1": (("C2", "C3"), ("A1", "B1"), ("A3", "C2")),
-                 "C2": (("C1", "C3"), ("A2", "B2")),
-                 "C3": (("C1", "C2"), ("A3", "B3"), ("A1", "B2"))}
+    WINNING_KEYS = (['A1', 'A2', 'A3'],
+                    ['B1', 'B2', 'B3'],
+                    ['C1', 'C2', 'C3'],
+                    ['A1', 'B1', 'C1'],
+                    ['A2', 'B2', 'C2'],
+                    ['A3', 'B3', 'C3'],
+                    ['A1', 'B2', 'C3'],
+                    ['A3', 'B2', 'C1'])
     GAME_IN_PROGRESS = 'Game in progress.'
     DRAW = 'Draw!'
     X_SIGN = 'X'
     O_SIGN = 'O'
+    EMPTY = ' '
     COLUMN_NUMBERS = '321'
     ROW_LETTERS = 'ABC'
     BOARD_FORMAT = '\n' +\
@@ -60,10 +59,9 @@ class TicTacToeBoard:
         return (self.BOARD_FORMAT).format(*[self.board[key]
                                             for key in self._keys])
 
-    def __winner(self, key, value):
-        key_lines = self.ALL_LINES[key]
-        for line in key_lines:
-            if self.board[line[0]] == value and self.board[line[1]] == value:
+    def __winner(self, value):
+        for key_line in self.WINNING_KEYS:
+            if all(self.board[i] == value != self.EMPTY for i in key_line):
                 return True
         return False
 
@@ -71,10 +69,10 @@ class TicTacToeBoard:
         status = self.status
         if self.status != self.GAME_IN_PROGRESS:
             return self.status
-        if " " not in self.board.values():
+        if self.EMPTY not in self.board.values():
             return self.DRAW
         else:
-            if self.__winner(key, value):
+            if self.__winner(value):
                 return '{} wins!'.format(self.turn)
             else:
                 return self.GAME_IN_PROGRESS
