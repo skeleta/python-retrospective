@@ -28,15 +28,15 @@ class Person:
             return self.kids
 
     def get_sisters(self):
-        return self._get_siblings(self.FEMALE)
+        return self.__get_siblings(self.FEMALE)
 
     def get_brothers(self):
-        return self._get_siblings(self.MALE)
+        return self.__get_siblings(self.MALE)
 
     def is_direct_successor(self, other_person):
         return other_person in self.children()
 
-    def _get_siblings(self, gender):
+    def __get_siblings(self, gender):
         all_siblings = list(self.mother.children() + self.father.children())
         return list(set(sibling for sibling in all_siblings
                     if sibling.gender == gender and sibling is not self))
