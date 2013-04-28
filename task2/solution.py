@@ -32,7 +32,7 @@ def cache(func, cache_size):
     def func_cashed(*args):
         if args not in cached_args:
             if (len(cached_args) >= cache_size):
-                cached_args .popitem(False)
+                cached_args.popitem(False)
             cached_args[args] = func(*args)
         return cached_args[args]
     return func_cashed
