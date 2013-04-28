@@ -1,10 +1,29 @@
 class TicTacToeBoard:
+    ALL_LINES = {"A1": (("A2", "A3"), ("B1", "C1"), ("B2", "C3")),
+                 "A2": (("A1", "A3"), ("B2", "C2")),
+                 "A3": (("A1", "A2"), ("B3", "C3"), ("B2", "C1")),
+                 "B1": (("B2", "B3"), ("A1", "C1")),
+                 "B2": (("B1", "B3"), ("A2", "C2"),
+                        ("A1", "C3"), ("A3", "C1")),
+                 "B3": (("B1", "B2"), ("A3", "C3")),
+                 "C1": (("C2", "C3"), ("A1", "B1"), ("A3", "C2")),
+                 "C2": (("C1", "C3"), ("A2", "B2")),
+                 "C3": (("C1", "C2"), ("A3", "B3"), ("A1", "B2"))}
     GAME_IN_PROGRESS = 'Game in progress.'
-    X_WINS = 'X wins!'
-    Y_WINS = 'Y wins!'
     DRAW = 'Draw!'
     X_SIGN = 'X'
     O_SIGN = 'O'
+    COLUMN_NUMBERS = '321'
+    ROW_LETTERS = 'ABC'
+    BOARD_FORMAT = '\n' +\
+                   '  -------------\n' +\
+                   '3 | {} | {} | {} |\n' +\
+                   '  -------------\n' +\
+                   '2 | {} | {} | {} |\n' +\
+                   '  -------------\n' +\
+                   '1 | {} | {} | {} |\n' +\
+                   '  -------------\n' +\
+                   '    A   B   C  \n'
 
     def __init__(self):
         self.turn = None
@@ -14,16 +33,16 @@ class TicTacToeBoard:
         self.board = {"A1": " ", "B1": " ", "C1": " ",
                       "A2": " ", "B2": " ", "C2": " ",
                       "A3": " ", "B3": " ", "C3": " "}
-        self.rows = [[" ", " ", " "],
-                     [" ", " ", " "],
-                     [" ", " ", " "]]
+        self.keys = [row + column
+                     for column in __class__.COLUMN_NUMBERS
+                     for row in __class__.ROW_LETTERS]
 
     def __setitem__(self, key, value):
         if value != __class__.X_SIGN and value != __class__.O_SIGN:
             raise InvalidValue("InvalidValue")
         if key not in self.board:
             raise InvalidKey("InvalidKey")
-        if self.turn == value:
+        if value == self.turn:
             raise NotYourTurn("NotYourTurn")
         if key in self.moves:
             raise InvalidMove("InvalidMove")
@@ -32,9 +51,6 @@ class TicTacToeBoard:
         else:
             self.turn = __class__.O_SIGN
         self.board[key] = value
-        self.rows = [[self.board["A3"], self.board["B3"], self.board["C3"]],
-                     [self.board["A2"], self.board["B2"], self.board["C2"]],
-                     [self.board["A1"], self.board["B1"], self.board["C1"]]]
         self.moves.append(key)
         self.status = self.update(key, value)
 
@@ -42,41 +58,27 @@ class TicTacToeBoard:
         return self.board[key]
 
     def __str__(self):
-        return '\n  -------------\n' +\
-            '3 | ' + self.board["A3"] + ' | ' + self.board["B3"] +\
-            ' | ' + self.board["C3"] + ' |\n' +\
-            '  -------------\n' +\
-            '2 | ' + self.board["A2"] + ' | ' + self.board["B2"] +\
-            ' | ' + self.board["C2"] + ' |\n' +\
-            '  -------------\n' +\
-            '1 | ' + self.board["A1"] + ' | ' + self.board["B1"] +\
-            ' | ' + self.board["C1"] + ' |\n' +\
-            '  -------------\n' +\
-            '    A   B   C  \n'
+        return (__class__.BOARD_FORMAT).format(*[self.board[key]
+                                                 for key in self.keys])
 
+    def winner(self, key, value):
+        key_lines = __class__.ALL_LINES[key]
+        for line in key_lines:
+            if self.board[line[0]] == value and self.board[line[1]] == value:
+                return value
+        return False
 
-
-    def update(self, kay, value):
+    def update(self, key, value):
         status = self.status
         if self.status != __class__.GAME_IN_PROGRESS:
             return self.status
         if " " not in self.board.values():
             return __class__.DRAW
         else:
-            for i in range(0, 3):
-                if self.rows[i][0] == self.rows[i][1] == self.rows[i][2] != " " \
-                        or self.rows[0][i] == self.rows[1][i] == self.rows[2][i] \
-                        != " ":
-                    if self.we_have_a_result is not True:
-                        self.we_have_a_result = True
-                        status = self.turn + ' wins!'
-            if self.rows[0][0] == self.rows[1][1] == self.rows[2][2] != " " \
-                    or self.rows[2][0] == self.rows[1][1] == self.rows[0][2] \
-                    != " ":
-                if self.we_have_a_result is not True:
-                    self.we_have_a_result = True
-                    status = self.turn + ' wins!'
-        return status
+            if self.winner(key, value):
+                return '{} wins!'.format(self.winner(key, value))
+            else:
+                return __class__.GAME_IN_PROGRESS
 
     def game_status(self):
         return self.status
